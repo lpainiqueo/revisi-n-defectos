@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESC · Revisión de Selección</title>
+<style>
+/* ════════════════════════════════════════════════════════════
+   DEFINICIÓN DE VARIABLES - SISTEMA DE DISEÑO
+   ════════════════════════════════════════════════════════════ */
+:root {
+  /* COLORES - Paleta ESC */
+  --color-bg:        #DCE0F2;
+  --color-surface:   #ffffff;
+  --color-surface2:  #eef0f8;
+  --color-text:      #1e2a38;
+  --color-text-muted:#6380A6;
+  --color-text-light:#DCE0F2;
+  --color-accent:    #405673;
+  --color-ok:        #3a6b4a;
+  --color-warn:      #7a6f5a;
+  --color-danger:    #8b3a3a;
+  --color-border:    #8A99A6;
+  --color-border-dark: #6380A6;
+
+  /* TIPOGRAFÍA */
+  --font-family: 'Courier New', monospace;
+  --font-size-base: 13px;
+  --font-size-small: 11px;
+  --font-size-xs: 9px;
+  --font-size-lg: 22px;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
+  /* ESPACIADO - Escala consistente */
+  --space-xs: 3px;
+  --space-sm: 6px;
+  --space-md: 10px;
+  --space-lg: 14px;
+  --space-xl: 16px;
+
+  /* BORDES */
+  --border-radius: 4px;
+  --border-radius-sm: 3px;
+  --border-radius-xs: 2px;
+  --border-width: 1px;
+  --border-width-thick: 2px;
+
+  /* TRANSICIONES */
+  --transition-fast: 0.15s;
+  --transition-normal: 0.2s;
+  --transition-slow: 0.25s;
+
+  /* Z-INDEX SCALE */
+  --z-dropdown: 100;
+  --z-header: 200;
+  --z-modal: 999;
+
+  /* EFECTOS */
+  --hover-opacity: 0.82;
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESET Y ESTILOS BASE
+   ════════════════════════════════════════════════════════════ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ════════════════════════════════════════════════════════════
+   HEADER
+   ════════════════════════════════════════════════════════════ */
+header {
+  background: var(--color-accent);
+  border-bottom: var(--border-width-thick) solid var(--color-border-dark);
+  padding: var(--space-md) var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+}
+
+header h1 {
+  font-size: var(--font-size-small);
+  letter-spacing: 2px;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+}
+
+#reloj {
+  color: var(--color-border);
+  font-size: var(--font-size-xs);
+}
+
+/* ════════════════════════════════════════════════════════════
+   TABS
+   ════════════════════════════════════════════════════════════ */
+.tabs {
+  display: flex;
+  background: var(--color-accent);
+  border-bottom: var(--border-width) solid var(--color-border-dark);
+  position: sticky;
+  top: 41px;
+  z-index: var(--z-dropdown);
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: var(--border-width-thick) solid transparent;
+  color: var(--color-border);
+  font-family: var(--font-family);
+  font-size: var(--font-size-xs);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 11px var(--space-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tab-btn:hover {
+  color: var(--color-text-light);
+}
+
+.tab-btn.active {
+  color: var(--color-text-light);
+  border-bottom-color: var(--color-text-light);
+}
+
+.tab-panel {
+  display: none;
+  padding: var(--space-lg);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* ════════════════════════════════════════════════════════════
+   LAYOUT
+   ════════════════════════════════════════════════════════════ */
+.two-col {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 800px) {
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.row3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 500px) {
+  .row2, .row3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   COMPONENTES - PANEL
+   ════════════════════════════════════════════════════════════ */
+.panel {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  box-shadow: var(--shadow-subtle);
+}
+
+.panel-title {
+  font-size: var(--font-size-xs);
+  letter-spacing: 2px;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  border-bottom: var(--border-width) solid var(--color-border);
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ════════════════════════════════════════════════════════════
+   FORMULARIOS
+   ════════════════════════════════════════════════════════════ */
+label {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xs);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+input[type=number],
+input[type=text],
+input[type=date],
+select,
+textarea {
+  width: 100%;
+  background: var(--color-surface2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  padding: var(--space-md) var(--space-md);
+  margin-bottom: var(--space-md);
+  outline: none;
+  transition: border-color var(--transition-normal);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(64, 86, 115, 0.1);
+}
+
+input.error,
+select.error {
+  border-color: var(--color-danger);
+  background: rgba(139, 58, 58, 0.08);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 48px;
+}
+
+.validador-live {
+  font-size: var(--font-size-xs);
+  padding: var(--space-sm);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--space-md);
+  display: none;
+}
+
+.validador-live.show {
+  display: block;
+}
+
+.validador-live.ok {
+  background: rgba(58, 107, 74, 0.15);
+  color: var(--color-ok);
+  border-left: 3px solid var(--color-ok);
+  padding-left: var(--space-md);
+}
+
+.validador-live.warn {
+  background: rgba(122, 111, 90, 0.15);
+  color: var(--color-warn);
+  border-left: 3px solid var(--color-warn);
+  padding-left: var(--space-md);
+}
+
+.validador-live.danger {
+  background: rgba(139, 58, 58, 0.15);
+  color: var(--color-danger);
+  border-left: 3px solid var(--color-danger);
+  padding-left: var(--space-md);
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOTONES
+   ════════════════════════════════════════════════════════════ */
+.btn {
+  display: inline-block;
+  padding: var(--space-md) var(--space-xl);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-small);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+  user-select: none;
+}
+
+.btn:hover {
+  opacity: var(--hover-opacity);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-text-light);
+  font-weight: var(--font-weight-bold);
+  width: 100%;
+}
+
+.btn-warn {
+  background: var(--color-warn);
+  color: var(--color-text);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: var(--color-text-light);
+}
+
+.btn-muted {
+  background: var(--color-surface2);
+  color: var(--color-text);
+  border: var(--border-width) solid var(--color-border);
+}
+
+.btn-sm {
+  padding: 4px var(--space-md);
+  font-size: var(--font-size-xs);
+}
+
+/* ════════════════════════════════════════════════════════════
+   INDICADORES LIVE
+   ════════════════════════════════════════════════════════════ */
+.live-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.live-box {
+  background: var(--color-surface2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.live-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+}
+
+.live-val {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+.live-val.ok {
+  color: var(--color-ok);
+}
+
+.live-val.warn {
+  color: var(--color-warn);
+}
+
+.live-val.danger {
+  color: var(--color-danger);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RECOMENDACIÓN BOX
+   ════════════════════════════════════════════════════════════ */
+.rec-box {
+  border-radius: var(--border-radius-sm);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border: var(--border-width) solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 48px;
+  transition: all var(--transition-normal);
+}
+
+.rec-box.ok {
+  background: rgba(58, 107, 74, 0.27);
+  border-color: var(--color-ok);
+}
+
+.rec-box.warn {
+  background: rgba(122, 111, 90, 0.27);
+  border-color: var(--color-warn);
+}
+
+.rec-box.danger {
+  background: rgba(139, 58, 58, 0.27);
+  border-color: var(--color-danger);
+}
+
+.rec-box.neutral {
+  background: var(--color-surface2);
+  border-color: var(--color-border);
+}
+
+.rec-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.rec-text {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.5px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TABLA Y BADGES
+   ════════════════════════════════════════════════════════════ */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-small);
+  min-width: 600px;
+}
+
+thead {
+  background: var(--color-surface2);
+}
+
+th {
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: var(--border-width) solid var(--color-border);
+  font-weight: var(--font-weight-bold);
+}
+
+td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: var(--border-width) solid var(--color-surface2);
+  vertical-align: middle;
+}
+
+tr:hover td {
+  background: var(--color-surface2);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: var(--border-radius-xs);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-ok {
+  background: rgba(58, 107, 74, 0.2);
+  color: var(--color-ok);
+  border: 1px solid var(--color-ok);
+}
+
+.badge-warn {
+  background: rgba(122, 111, 90, 0.2);
+  color: var(--color-warn);
+  border: 1px solid var(--color-warn);
+}
+
+.badge-danger {
+  background: rgba(139, 58, 58, 0.2);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+
+.empty-msg {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 28px;
+  font-size: var(--font-size-small);
+}
+
+/* ════════════════════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: var(--space-xl);
+  right: var(--space-xl);
+  background: var(--color-accent);
+  color: var(--color-text-light);
+  font-family: var(--font-family);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--border-radius-sm);
+  z-index: var(--z-modal);
+  transform: translateY(60px);
+  opacity: 0;
+  transition: all var(--transition-slow);
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ════════════════════════════════════════════════════════════
+   SCORE BAR
+   ════════════════════════════════════════════════════════════ */
+.score-bar-wrap {
+  background: var(--color-surface2);
+  border-radius: var(--border-radius-xs);
+  height: 5px;
+  width: 80px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: var(--space-sm);
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: var(--border-radius-xs);
+  transition: width var(--transition-slow);
+}
+
+/* ════════════════════════════════════════════════════════════
+   HALLAZGOS
+   ════════════════════════════════════════════════════════════ */
+.hallazgo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--color-surface2);
+  border-radius: var(--border-radius-sm);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.hallazgo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hallazgo-label {
+  flex: 1;
+  font-size: var(--font-size-small);
+}
+
+.hallazgo-pct {
+  font-size: var(--font-size-small);
+  width: 48px;
+  text-align: right;
+  font-weight: var(--font-weight-bold);
+}
+
+.hallazgo-input {
+  width: 58px;
+  text-align: center;
+  padding: 5px 6px;
+  font-size: 14px;
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TOLERANCIAS
+   ════════════════════════════════════════════════════════════ */
+.tol-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-sm);
+  align-items: center;
+  margin-bottom: var(--space-sm);
+  font-size: var(--font-size-small);
+}
+
+.tol-label {
+  color: var(--color-text-muted);
+}
+
+.tol-input {
+  width: 100%;
+  background: var(--color-surface2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-small);
+  padding: 5px 8px;
+  outline: none;
+  margin: 0;
+  text-align: center;
+  transition: border-color var(--transition-normal);
+}
+
+.tol-input:focus {
+  border-color: var(--color-accent);
+}
+
+.tol-section {
+  margin-bottom: var(--space-lg);
+}
+
+.tol-header {
+  font-size: var(--font-size-xs);
+  letter-spacing: 1.5px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ESC · Revisión de Selección</h1>
+  <div id="reloj"></div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="cambiarTab('defecto')">Defectos</button>
+  <button class="tab-btn" onclick="cambiarTab('categoria')">Categorías</button>
+  <button class="tab-btn" onclick="cambiarTab('historial')">Historial</button>
+  <button class="tab-btn" onclick="cambiarTab('exportar')">Exportar</button>
+</div>
+
+<!-- TAB: DEFECTOS -->
+<div id="defecto" class="tab-panel active">
+  <div class="two-col">
+    <div>
+      <div class="panel">
+        <div class="panel-title">Registro de Defecto</div>
+        
+        <label>Fecha</label>
+        <input type="date" id="d-fecha">
+        
+        <label>Variedad</label>
+        <input type="text" id="d-variedad" placeholder="ej: Fuji, Gala">
+        
+        <label>Categoría</label>
+        <select id="d-categoria">
+          <option value="">-- Seleccionar --</option>
+          <option value="EXTRA">EXTRA</option>
+          <option value="PRIMERA">PRIMERA</option>
+          <option value="SEGUNDA">SEGUNDA</option>
+          <option value="TERCERA">TERCERA</option>
+        </select>
+
+        <label>Defecto</label>
+        <input type="text" id="d-defecto" placeholder="ej: Mancha, Deformación" data-listener="defecto">
+        
+        <label>Breakpoint (%)</label>
+        <input type="number" id="d-bp" min="0" max="100" step="0.1" placeholder="0-100" data-listener="defecto">
+        
+        <label>FM - % Defecto</label>
+        <input type="number" id="d-fm" min="0" max="100" step="0.1" placeholder="0-100" data-listener="defecto">
+        
+        <label>Total (frutas revisadas)</label>
+        <input type="number" id="d-total" min="0" step="1" placeholder="ej: 100" data-listener="defecto">
+        
+        <label>FN (No detectados)</label>
+        <input type="number" id="d-fn" min="0" step="1" placeholder="0" data-listener="defecto">
+        
+        <label>FP (Falsas alarmas)</label>
+        <input type="number" id="d-fp" min="0" step="1" placeholder="0" data-listener="defecto">
+
+        <div id="validador-defecto" class="validador-live"></div>
+        
+        <button class="btn btn-primary" onclick="guardarDefecto()">Guardar Defecto</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-title">Indicadores en Vivo</div>
+        
+        <div class="live-grid">
+          <div class="live-box">
+            <div class="live-label">Score</div>
+            <div class="live-val" id="live-score">—</div>
+          </div>
+          <div class="live-box">
+            <div class="live-label">FN %</div>
+            <div class="live-val" id="live-fn-pct">—</div>
+          </div>
+          <div class="live-box">
+            <div class="live-label">FP %</div>
+            <div class="live-val" id="live-fp-pct">—</div>
+          </div>
+        </div>
+
+        <div class="rec-box neutral">
+          <div class="rec-icon">ℹ</div>
+          <div class="rec-text" id="rec-texto">Ingresa datos para ver recomendación</div>
+        </div>
+
+        <div id="estado-linea"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: CATEGORÍAS -->
+<div id="categoria" class="tab-panel">
+  <div class="two-col">
+    <div>
+      <div class="panel">
+        <div class="panel-title">Registro de Categoría</div>
+        
+        <label>Fecha</label>
+        <input type="date" id="c-fecha">
+        
+        <label>Variedad</label>
+        <input type="text" id="c-variedad" placeholder="ej: Fuji, Gala">
+        
+        <label>Categoría</label>
+        <select id="c-categoria">
+          <option value="">-- Seleccionar --</option>
+          <option value="EXTRA">EXTRA</option>
+          <option value="PRIMERA">PRIMERA</option>
+          <option value="SEGUNDA">SEGUNDA</option>
+          <option value="TERCERA">TERCERA</option>
+        </select>
+
+        <label>Total (frutas revisadas)</label>
+        <input type="number" id="c-total" min="0" step="1" placeholder="ej: 100" data-listener="categoria">
+        
+        <label>FM - Defectos Menores (%)</label>
+        <input type="number" id="c-fm" min="0" max="100" step="0.1" placeholder="0-100" data-listener="categoria">
+
+        <button class="btn btn-primary" onclick="guardarCategoria()">Guardar Categoría</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-title">Indicadores</div>
+        
+        <div class="live-grid">
+          <div class="live-box">
+            <div class="live-label">Total</div>
+            <div class="live-val" id="live-c-total">0</div>
+          </div>
+          <div class="live-box">
+            <div class="live-label">FM %</div>
+            <div class="live-val" id="live-c-fm">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: HISTORIAL -->
+<div id="historial" class="tab-panel">
+  <div class="panel">
+    <div class="panel-title">
+      Historial de Registros
+      <div>
+        <button class="btn btn-muted btn-sm" onclick="limpiarHistorial('def')">Limpiar Defectos</button>
+        <button class="btn btn-muted btn-sm" onclick="limpiarHistorial('cat')">Limpiar Categorías</button>
+      </div>
+    </div>
+    
+    <div class="table-wrap">
+      <table id="tabla-historial">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Variedad</th>
+            <th>Categoría</th>
+            <th>Defecto/FM</th>
+            <th>Total</th>
+            <th>FN</th>
+            <th>FP</th>
+            <th>Score</th>
+            <th>Recomendación</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="11" class="empty-msg">Sin registros</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: EXPORTAR -->
+<div id="exportar" class="tab-panel">
+  <div class="panel">
+    <div class="panel-title">Exportar Datos</div>
+    
+    <button class="btn btn-primary" onclick="csvExporter.exportarDefectos()" style="margin-bottom:10px;">
+      📥 Exportar Defectos (CSV)
+    </button>
+    <button class="btn btn-primary" onclick="csvExporter.exportarCategorias()" style="margin-bottom:10px;">
+      📥 Exportar Categorías (CSV)
+    </button>
+    
+    <label style="margin-top:20px;">Importar CSV</label>
+    <input type="file" accept=".csv" onchange="importarCSV(event)">
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIGURACIÓN CENTRALIZADA
+// ════════════════════════════════════════════════════════════
+const CONFIG = {
+  // Categorías estándar ESC
+  categorias: ['EXTRA', 'PRIMERA', 'SEGUNDA', 'TERCERA'],
+  
+  // Umbrales para estado de línea
+  // Basado en análisis predictivo del historial
+  estadoLinea: {
+    critica: 25,      // Score promedio > 25: línea fuera de especificación
+    inestable: 12     // Score promedio 12-25: línea operando marginalmente
+  },
+
+  // Pesos de score (FN crítico, FP secundario)
+  scoring: {
+    pesoFN: 0.65,     // FN más importante (65%)
+    pesoFP: 0.35      // FP menos importante (35%)
+  },
+
+  // Configuración de análisis
+  analisisPrincipal: 10  // Últimos 10 registros para evaluar estado
+};
+
+// Storage keys
+const K = {
+  def: 'esc_defectos',
+  cat: 'esc_categorias'
+};
+
+// ════════════════════════════════════════════════════════════
+// STORAGE SIMPLE
+// ════════════════════════════════════════════════════════════
+function load(key) {
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : [];
+}
+
+function save(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+// ════════════════════════════════════════════════════════════
+// VALIDACIONES (PUNTO 1 - AJUSTADO)
+// ════════════════════════════════════════════════════════════
+
+function validarDefecto() {
+  const total = parseInt(document.getElementById('d-total').value) || 0;
+  const fn = parseInt(document.getElementById('d-fn').value) || 0;
+  const fp = parseInt(document.getElementById('d-fp').value) || 0;
+  const bp = parseFloat(document.getElementById('d-bp').value) || 0;
+  const fm = parseFloat(document.getElementById('d-fm').value) || 0;
+  
+  const errores = [];
+
+  // Validación 1: Total > 0
+  if (total <= 0) {
+    errores.push('Total debe ser > 0');
+  }
+
+  // Validación 2: FN + FP no puede superar total
+  if (fn + fp > total) {
+    errores.push(`FN (${fn}) + FP (${fp}) no puede superar Total (${total})`);
+  }
+
+  // Validación 3: FN y FP no negativos
+  if (fn < 0 || fp < 0) {
+    errores.push('FN y FP no pueden ser negativos');
+  }
+
+  // Validación 4: Breakpoint rango válido
+  if (bp < 0 || bp > 100) {
+    errores.push('Breakpoint debe estar entre 0-100');
+  }
+
+  // Validación 5: FM rango válido
+  if (fm < 0 || fm > 100) {
+    errores.push('FM debe estar entre 0-100');
+  }
+  
+  // Nota: FM puede ser 0 (revisiones sin defectos en esa característica)
+
+  return {
+    valido: errores.length === 0,
+    errores: errores
+  };
+}
+
+function mostrarValidacionDefecto() {
+  const validacion = validarDefecto();
+  const validadorEl = document.getElementById('validador-defecto');
+
+  if (validacion.errores.length > 0) {
+    validadorEl.innerHTML = '⚠ ' + validacion.errores.join('; ');
+    validadorEl.className = 'validador-live show danger';
+  } else if (document.getElementById('d-total').value) {
+    validadorEl.innerHTML = '✓ Datos consistentes';
+    validadorEl.className = 'validador-live show ok';
+  } else {
+    validadorEl.className = 'validador-live';
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILIDADES
+// ════════════════════════════════════════════════════════════
+
+function hoy() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function reloj() {
+  const h = new Date().toLocaleTimeString();
+  document.getElementById('reloj').textContent = h;
+  setTimeout(reloj, 1000);
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function cambiarTab(tabName) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════════
+// CÁLCULO DE SCORE
+// ════════════════════════════════════════════════════════════
+
+function calcularScore(fnPct, fpPct) {
+  const fn = parseFloat(fnPct) || 0;
+  const fp = parseFloat(fpPct) || 0;
+  return (fn * CONFIG.scoring.pesoFN) + (fp * CONFIG.scoring.pesoFP);
+}
+
+// ════════════════════════════════════════════════════════════
+// ESTADO DE LÍNEA (PUNTO 7)
+// ════════════════════════════════════════════════════════════
+/*
+  El estado de línea refleja la salud predictiva del sistema basándose en:
+  - Últimos 10 registros de defectos
+  - Score promedio = (FN% * 0.65) + (FP% * 0.35)
+  - FN pesa más porque es crítico (falsos negativos = defectos no detectados)
+  
+  Umbrales:
+  - Score > 25: CRÍTICA (intervención inmediata)
+  - Score 12-25: INESTABLE (monitoreo frecuente)
+  - Score < 12: ESTABLE (operación normal)
+*/
+
+function estadoLinea() {
+  const data = load(K.def).slice(0, CONFIG.analisisPrincipal);
+
+  if (!data.length) {
+    return {
+      estado: 'SIN DATOS',
+      color: 'var(--color-text-muted)',
+      scorePromedio: null
+    };
+  }
+
+  let scorePromedio = 0;
+  data.forEach(r => {
+    scorePromedio += r.score || 0;
+  });
+  scorePromedio /= data.length;
+
+  let estado, color;
+
+  if (scorePromedio > CONFIG.estadoLinea.critica) {
+    estado = 'CRÍTICA';
+    color = 'var(--color-danger)';
+  } else if (scorePromedio > CONFIG.estadoLinea.inestable) {
+    estado = 'INESTABLE';
+    color = 'var(--color-warn)';
+  } else {
+    estado = 'ESTABLE';
+    color = 'var(--color-ok)';
+  }
+
+  return { estado, color, scorePromedio };
+}
+
+function renderEstadoLinea() {
+  const e = estadoLinea();
+  const scoreText = e.scorePromedio !== null 
+    ? e.scorePromedio.toFixed(2) 
+    : '—';
+
+  document.getElementById('estado-linea').innerHTML = `
+    <div class="rec-box neutral" style="border-left:4px solid ${e.color};">
+      <span style="color:${e.color};font-weight:bold;font-size:12px;">
+        ● ${e.estado}
+      </span>
+      <span style="color:var(--color-text-muted);font-size:10px;">
+        Score: ${scoreText}
+      </span>
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════════
+// DEFECTOS
+// ════════════════════════════════════════════════════════════
+
+function defActualizarUI() {
+  const total = parseInt(document.getElementById('d-total').value) || 0;
+  const fn = parseInt(document.getElementById('d-fn').value) || 0;
+  const fp = parseInt(document.getElementById('d-fp').value) || 0;
+
+  if (!total) {
+    document.getElementById('live-score').textContent = '—';
+    document.getElementById('live-fn-pct').textContent = '—';
+    document.getElementById('live-fp-pct').textContent = '—';
+    return;
+  }
+
+  const fnPct = (fn / total) * 100;
+  const fpPct = (fp / total) * 100;
+  const score = calcularScore(fnPct, fpPct);
+
+  // Actualizar indicadores
+  document.getElementById('live-score').innerHTML = score.toFixed(2);
+  document.getElementById('live-fn-pct').innerHTML = fnPct.toFixed(1) + '%';
+  document.getElementById('live-fp-pct').innerHTML = fpPct.toFixed(1) + '%';
+
+  // Colorear según score
+  const scoreEl = document.getElementById('live-score');
+  scoreEl.className = 'live-val';
+  if (score > CONFIG.estadoLinea.critica) {
+    scoreEl.classList.add('danger');
+  } else if (score > CONFIG.estadoLinea.inestable) {
+    scoreEl.classList.add('warn');
+  } else {
+    scoreEl.classList.add('ok');
+  }
+
+  // Validación en vivo
+  mostrarValidacionDefecto();
+
+  // Recomendación
+  let rec, icon;
+  if (score > CONFIG.estadoLinea.critica) {
+    rec = 'CRÍTICA: Intervención inmediata';
+    icon = '⚠';
+  } else if (score > CONFIG.estadoLinea.inestable) {
+    rec = 'INESTABLE: Monitoreo frecuente';
+    icon = '⚡';
+  } else {
+    rec = 'ESTABLE: Operación normal';
+    icon = '✓';
+  }
+
+  document.getElementById('rec-texto').innerHTML = `${icon} ${rec}`;
+}
+
+function guardarDefecto() {
+  const validacion = validarDefecto();
+  
+  if (!validacion.valido) {
+    toast(`❌ ${validacion.errores[0]}`);
+    return;
+  }
+
+  const total = parseInt(document.getElementById('d-total').value) || 0;
+  const fn = parseInt(document.getElementById('d-fn').value) || 0;
+  const fp = parseInt(document.getElementById('d-fp').value) || 0;
+  const fnPct = (fn / total) * 100;
+  const fpPct = (fp / total) * 100;
+  const score = calcularScore(fnPct, fpPct);
+
+  const defecto = {
+    id: Date.now(),
+    fecha: document.getElementById('d-fecha').value,
+    variedad: document.getElementById('d-variedad').value,
+    cat: document.getElementById('d-categoria').value,
+    defecto: document.getElementById('d-defecto').value,
+    bp: parseFloat(document.getElementById('d-bp').value) || 0,
+    fm: parseFloat(document.getElementById('d-fm').value) || 0,
+    total: total,
+    fnRaw: fn,
+    fpRaw: fp,
+    fnPct: fnPct,
+    fpPct: fpPct,
+    score: score,
+    rec: score > CONFIG.estadoLinea.critica ? 'CRÍTICA' : 
+         score > CONFIG.estadoLinea.inestable ? 'INESTABLE' : 'ESTABLE'
+  };
+
+  const defectos = load(K.def);
+  save(K.def, [defecto, ...defectos]);
+  
+  renderHistorial();
+  renderEstadoLinea();
+  
+  // Limpiar formulario
+  document.getElementById('d-variedad').value = '';
+  document.getElementById('d-categoria').value = '';
+  document.getElementById('d-defecto').value = '';
+  document.getElementById('d-bp').value = '';
+  document.getElementById('d-fm').value = '';
+  document.getElementById('d-total').value = '';
+  document.getElementById('d-fn').value = '';
+  document.getElementById('d-fp').value = '';
+  document.getElementById('validador-defecto').className = 'validador-live';
+  defActualizarUI();
+  
+  toast('✓ Defecto guardado');
+}
+
+// ════════════════════════════════════════════════════════════
+// CATEGORÍAS
+// ════════════════════════════════════════════════════════════
+
+function catActualizarLive() {
+  const total = parseInt(document.getElementById('c-total').value) || 0;
+  const fm = parseFloat(document.getElementById('c-fm').value) || 0;
+
+  document.getElementById('live-c-total').textContent = total;
+  document.getElementById('live-c-fm').textContent = fm.toFixed(1) + '%';
+}
+
+function guardarCategoria() {
+  const total = parseInt(document.getElementById('c-total').value) || 0;
+  const fm = parseFloat(document.getElementById('c-fm').value) || 0;
+
+  if (total <= 0) {
+    toast('❌ Total debe ser > 0');
+    return;
+  }
+
+  const categoria = {
+    id: Date.now(),
+    fecha: document.getElementById('c-fecha').value,
+    variedad: document.getElementById('c-variedad').value,
+    cat: document.getElementById('c-categoria').value,
+    total: total,
+    fm: fm,
+    hallazgos: []
+  };
+
+  const categorias = load(K.cat);
+  save(K.cat, [categoria, ...categorias]);
+  
+  renderHistorial();
+
+  document.getElementById('c-variedad').value = '';
+  document.getElementById('c-categoria').value = '';
+  document.getElementById('c-total').value = '';
+  document.getElementById('c-fm').value = '';
+  catActualizarLive();
+
+  toast('✓ Categoría guardada');
+}
+
+// ════════════════════════════════════════════════════════════
+// HISTORIAL
+// ════════════════════════════════════════════════════════════
+
+function renderHistorial() {
+  const defectos = load(K.def);
+  const categorias = load(K.cat);
+  const tbody = document.querySelector('#tabla-historial tbody');
+
+  if (defectos.length === 0 && categorias.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" class="empty-msg">Sin registros</td></tr>';
+    return;
+  }
+
+  let html = '';
+
+  defectos.forEach(r => {
+    const scoreCol = `<span style="color:${r.score > CONFIG.estadoLinea.critica ? 'var(--color-danger)' : r.score > CONFIG.estadoLinea.inestable ? 'var(--color-warn)' : 'var(--color-ok)'};font-weight:bold;">${r.score.toFixed(2)}</span>`;
+    const recBadge = `<span class="badge badge-${r.score > CONFIG.estadoLinea.critica ? 'danger' : r.score > CONFIG.estadoLinea.inestable ? 'warn' : 'ok'}">${r.rec}</span>`;
+
+    html += `
+      <tr>
+        <td>${r.fecha}</td>
+        <td><span class="badge badge-warn">Defecto</span></td>
+        <td>${r.variedad}</td>
+        <td>${r.cat}</td>
+        <td>${r.defecto}</td>
+        <td style="text-align:center">${r.total}</td>
+        <td>${r.fnRaw}</td>
+        <td>${r.fpRaw}</td>
+        <td>${scoreCol}</td>
+        <td>${recBadge}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="eliminarRegistro('def',${r.id})">✕</button></td>
+      </tr>
+    `;
+  });
+
+  categorias.forEach(r => {
+    html += `
+      <tr>
+        <td>${r.fecha}</td>
+        <td><span class="badge badge-ok">Categoría</span></td>
+        <td>${r.variedad}</td>
+        <td>${r.cat}</td>
+        <td>FM: ${r.fm}%</td>
+        <td style="text-align:center">${r.total}</td>
+        <td colspan="4" style="color:var(--color-text-muted);">—</td>
+        <td><button class="btn btn-danger btn-sm" onclick="eliminarRegistro('cat',${r.id})">✕</button></td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function eliminarRegistro(tipo, id) {
+  if (!confirm('¿Eliminar este registro?')) return;
+  const key = tipo === 'cat' ? K.cat : K.def;
+  const data = load(key).filter(r => r.id !== id);
+  save(key, data);
+  renderHistorial();
+  renderEstadoLinea();
+}
+
+function limpiarHistorial(tipo) {
+  if (!confirm('¿Eliminar todos los registros?')) return;
+  save(tipo === 'cat' ? K.cat : K.def, []);
+  renderHistorial();
+  renderEstadoLinea();
+}
+
+// ════════════════════════════════════════════════════════════
+// EXPORTADOR CSV SEGURO (PUNTO 8)
+// ════════════════════════════════════════════════════════════
+
+class CSVExporter {
+  escaparCSV(str) {
+    if (str === null || str === undefined) {
+      return '';
+    }
+
+    str = String(str);
+
+    // Si contiene comilla, coma, salto de línea: envolver en comillas
+    if (str.includes('"') || str.includes(',') || str.includes('\n')) {
+      str = str.replace(/"/g, '""');
+      return `"${str}"`;
+    }
+
+    // Prevenir inyección de fórmulas en Excel
+    if (str[0] === '=' || str[0] === '+' || str[0] === '-' || str[0] === '@') {
+      return `'${str}`;
+    }
+
+    return str;
+  }
+
+  filaACSV(fila) {
+    return fila.map(campo => this.escaparCSV(campo)).join(',');
+  }
+
+  exportarDefectos() {
+    const data = load(K.def);
+    
+    if (!data.length) {
+      alert('No hay registros de defectos para exportar.');
+      return;
+    }
+
+    const header = [
+      'Fecha', 'Variedad', 'Categoria', 'Defecto', 'Breakpoint',
+      'FM_pct', 'Total', 'FN_cant', 'FP_cant', 'FN_pct', 'FP_pct',
+      'Score', 'Recomendacion'
+    ];
+
+    const rows = data.map(r => [
+      this.escaparCSV(r.fecha),
+      this.escaparCSV(r.variedad),
+      this.escaparCSV(r.cat),
+      this.escaparCSV(r.defecto),
+      r.bp,
+      r.fm,
+      r.total,
+      r.fnRaw ?? '—',
+      r.fpRaw ?? '—',
+      (r.fnPct ?? '—').toString().replace('.', ','),
+      (r.fpPct ?? '—').toString().replace('.', ','),
+      (r.score ?? '—').toString().replace('.', ','),
+      this.escaparCSV(r.rec || '—')
+    ]);
+
+    this.descargarCSV(header, rows, 'def');
+  }
+
+  exportarCategorias() {
+    const data = load(K.cat);
+    
+    if (!data.length) {
+      alert('No hay registros de categorías para exportar.');
+      return;
+    }
+
+    const header = ['Fecha', 'Variedad', 'Categoria', 'Total', 'FM_pct'];
+
+    const rows = data.map(r => [
+      this.escaparCSV(r.fecha),
+      this.escaparCSV(r.variedad),
+      this.escaparCSV(r.cat),
+      r.total,
+      (r.fm ?? '—').toString().replace('.', ',')
+    ]);
+
+    this.descargarCSV(header, rows, 'cat');
+  }
+
+  descargarCSV(header, rows, tipo) {
+    const tipoSafe = ['cat', 'def'].includes(tipo) ? tipo : 'data';
+    
+    // BOM para Excel reconozca UTF-8
+    const BOM = '\uFEFF';
+    const csvContent = BOM + [
+      this.filaACSV(header),
+      ...rows.map(r => this.filaACSV(r))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    const fecha = new Date().toISOString().split('T')[0];
+    const filename = `esc_${tipoSafe}_${fecha}.csv`;
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+    toast(`✓ Descargado: ${filename}`);
+  }
+}
+
+const csvExporter = new CSVExporter();
+
+// ════════════════════════════════════════════════════════════
+// IMPORTAR CSV
+// ════════════════════════════════════════════════════════════
+
+function importarCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const lineas = e.target.result.split('\n')
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
+
+      if (lineas.length < 2) {
+        alert('El archivo CSV está vacío.');
+        return;
+      }
+
+      const header = lineas[0].split(',');
+      const tipo = header.includes('Hallazgos') ? 'cat' : 'def';
+      const key = tipo === 'cat' ? K.cat : K.def;
+      const existing = new Set(load(key).map(r => r.id));
+
+      const registros = [];
+      let duplicados = 0;
+      let filasSaltadas = 0;
+
+      for (let i = 1; i < lineas.length; i++) {
+        const cols = lineas[i].split(',').map(c => c.trim());
+        if (cols.length < 4) {
+          filasSaltadas++;
+          continue;
+        }
+
+        let registro;
+        if (tipo === 'cat') {
+          const id = Date.now() + i;
+          const dupKey = String(cols[0] + cols[1] + cols[2]);
+          if (existing.has(dupKey)) {
+            duplicados++;
+            continue;
+          }
+          registro = {
+            id,
+            fecha: cols[0],
+            variedad: cols[1],
+            cat: cols[2],
+            total: parseInt(cols[3]) || 0,
+            fm: parseFloat(cols[4]) || 0,
+            hallazgos: []
+          };
+        } else {
+          const id = Date.now() + i;
+          const dupKey = String(cols[0] + cols[1] + cols[3]);
+          if (existing.has(dupKey)) {
+            duplicados++;
+            continue;
+          }
+          registro = {
+            id,
+            fecha: cols[0],
+            variedad: cols[1],
+            cat: cols[2],
+            defecto: cols[3],
+            bp: parseFloat(cols[4]) || 0,
+            fm: parseFloat(cols[5]) || 0,
+            total: parseInt(cols[6]) || 0,
+            fnRaw: cols[7] === '—' ? null : parseInt(cols[7]),
+            fpRaw: cols[8] === '—' ? null : parseInt(cols[8]),
+            fnPct: cols[9] === '—' ? null : parseFloat(cols[9]),
+            fpPct: cols[10] === '—' ? null : parseFloat(cols[10]),
+            score: cols[11] === '—' ? null : parseFloat(cols[11]),
+            rec: cols[12] || '—'
+          };
+        }
+
+        registros.push(registro);
+      }
+
+      if (registros.length === 0) {
+        alert(`No se importaron registros.${duplicados > 0 ? `\n${duplicados} omitidos (duplicados).` : ''}`);
+        event.target.value = '';
+        return;
+      }
+
+      const data = load(key);
+      save(key, [...registros, ...data]);
+      renderHistorial();
+      renderEstadoLinea();
+
+      let msg = `✓ ${registros.length} registros importados.`;
+      if (duplicados > 0) msg += `\n↩ ${duplicados} omitidos (duplicados).`;
+      if (filasSaltadas > 0) msg += `\n⚠ ${filasSaltadas} filas incompletas.`;
+      alert(msg);
+
+      toast('✓ Importación completa');
+
+    } catch (err) {
+      alert('Error al leer CSV: ' + err.message);
+    }
+
+    event.target.value = '';
+  };
+
+  reader.readAsText(file);
+}
+
+// ════════════════════════════════════════════════════════════
+// LISTENERS (PUNTO 3 - ALTERNATIVA SIMPLE)
+// ════════════════════════════════════════════════════════════
+
+const LISTENERS_CONFIG = {
+  'defecto': {
+    selector: '[data-listener="defecto"]',
+    evento: 'input',
+    callback: defActualizarUI
+  },
+  'categoria': {
+    selector: '[data-listener="categoria"]',
+    evento: 'input',
+    callback: catActualizarLive
+  }
+};
+
+function setupAllListeners() {
+  Object.entries(LISTENERS_CONFIG).forEach(([nombre, config]) => {
+    const elementos = document.querySelectorAll(config.selector);
+    console.log(`📍 ${nombre}: ${elementos.length} elementos`);
+    
+    elementos.forEach(el => {
+      el.addEventListener(config.evento, config.callback);
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Fechas de hoy
+  document.getElementById('d-fecha').value = hoy();
+  document.getElementById('c-fecha').value = hoy();
+
+  // Reloj
+  reloj();
+
+  // Listeners
+  setupAllListeners();
+
+  // Render inicial
+  renderHistorial();
+  renderEstadoLinea();
+  catActualizarLive();
+  defActualizarUI();
+
+  console.log('✓ App inicializada');
+});
+
+</script>
+</body>
+</html>
