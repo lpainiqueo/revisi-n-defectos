@@ -673,19 +673,49 @@ tr:hover td {
         <input type="date" id="d-fecha">
         
         <label>Variedad</label>
-        <input type="text" id="d-variedad" placeholder="ej: Fuji, Gala">
+        <select id="d-variedad">
+          <option value="">-- Seleccionar --</option>
+          <option value="Fuji">Fuji</option>
+          <option value="Gala">Gala</option>
+          <option value="Envy">Envy</option>
+          <option value="C.pink">C.pink</option>
+          <option value="Honey">Honey</option>
+          <option value="MAIA1">MAIA1</option>
+          <option value="otras">otras</option>
+        </select>
         
         <label>Categoría</label>
         <select id="d-categoria">
           <option value="">-- Seleccionar --</option>
-          <option value="EXTRA">EXTRA</option>
-          <option value="PRIMERA">PRIMERA</option>
-          <option value="SEGUNDA">SEGUNDA</option>
-          <option value="TERCERA">TERCERA</option>
+          <option value="EXP">EXP (FrutaSinDefectos)</option>
+          <option value="DFCY">DFCY (FrutaConDefectosLeves)</option>
+          <option value="CAT1">CAT1 (FrutaConDefectosModeredos)</option>
+          <option value="COMERCIAL">COMERCIAL (FrutaNoExportable)</option>
         </select>
 
         <label>Defecto</label>
-        <input type="text" id="d-defecto" placeholder="ej: Mancha, Deformación" data-listener="defecto">
+        <select id="d-defecto" data-listener="defecto">
+          <option value="">-- Seleccionar --</option>
+          <option value="Doubles">Doubles (FrutosDobles)</option>
+          <option value="Leaves">Leaves (Hojas)</option>
+          <option value="Rotation">Rotation (ErrorDeRotacion)</option>
+          <option value="InternalRot">InternalRot (PudricionInterna/Infiltracion)</option>
+          <option value="Scab">Scab (Escara/HeridasAbiertas)</option>
+          <option value="Cisarrot">Cisarrot (Pardeamiento)</option>
+          <option value="Crack">Crack (PartiduraPeduncular)</option>
+          <option value="StemDefect">StemDefect (PartiduraPeduncular)</option>
+          <option value="Decay">Decay (HeridasAbiertas/Peduncular)</option>
+          <option value="ScaleScore">ScaleScore (Escama)</option>
+          <option value="Pitting">Pitting (Picaduras)</option>
+          <option value="BruiseArea">BruiseArea (Machucón)</option>
+          <option value="OiseScore">OiseScore (Machucón)</option>
+          <option value="Sunburn">Sunburn (GolpeDeSol/QuemaduraDeSol)</option>
+          <option value="StemendRusset">StemendRusset (RussetPeduncular)</option>
+          <option value="RussetArea">RussetArea (RussetareaDelFruto)</option>
+          <option value="Misshapen">Misshapen (Russet)</option>
+          <option value="LightScars">LightScars (Russet)</option>
+          <option value="Defects">Defects (DefectoGeneral/Superficial)</option>
+        </select>
         
         <label>Breakpoint (%)</label>
         <input type="number" id="d-bp" min="0" max="100" step="0.1" placeholder="0-100" data-listener="defecto">
@@ -743,28 +773,41 @@ tr:hover td {
   <div class="two-col">
     <div>
       <div class="panel">
-        <div class="panel-title">Registro de Categoría</div>
+        <div class="panel-title">Registro de Categoría por Muestra</div>
         
         <label>Fecha</label>
         <input type="date" id="c-fecha">
         
         <label>Variedad</label>
-        <input type="text" id="c-variedad" placeholder="ej: Fuji, Gala">
-        
-        <label>Categoría</label>
-        <select id="c-categoria">
+        <select id="c-variedad">
           <option value="">-- Seleccionar --</option>
-          <option value="EXTRA">EXTRA</option>
-          <option value="PRIMERA">PRIMERA</option>
-          <option value="SEGUNDA">SEGUNDA</option>
-          <option value="TERCERA">TERCERA</option>
+          <option value="Fuji">Fuji</option>
+          <option value="Gala">Gala</option>
+          <option value="Envy">Envy</option>
+          <option value="C.pink">C.pink</option>
+          <option value="Honey">Honey</option>
+          <option value="MAIA1">MAIA1</option>
+          <option value="otras">otras</option>
         </select>
-
-        <label>Total (frutas revisadas)</label>
+        
+        <label>Total (frutas revisadas en muestra)</label>
         <input type="number" id="c-total" min="0" step="1" placeholder="ej: 100" data-listener="categoria">
         
-        <label>FM - Defectos Menores (%)</label>
-        <input type="number" id="c-fm" min="0" max="100" step="0.1" placeholder="0-100" data-listener="categoria">
+        <div style="margin: var(--space-lg) 0; padding: var(--space-lg); background: var(--color-surface2); border-radius: var(--border-radius);">
+          <div style="font-size: var(--font-size-xs); letter-spacing: 1px; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--space-md);">Desglose por Categoría</div>
+          
+          <label>EXP - FrutaSinDefectos (frutas)</label>
+          <input type="number" id="c-limpia" min="0" step="1" placeholder="0" data-listener="categoria">
+          
+          <label>DFCY - FrutaConDefectosLeves (frutas)</label>
+          <input type="number" id="c-leve" min="0" step="1" placeholder="0" data-listener="categoria">
+          
+          <label>CAT1 - FrutaConDefectosModeredos (frutas)</label>
+          <input type="number" id="c-mejorado" min="0" step="1" placeholder="0" data-listener="categoria">
+          
+          <label>COMERCIAL - FrutaNoExportable (frutas)</label>
+          <input type="number" id="c-grave" min="0" step="1" placeholder="0" data-listener="categoria">
+        </div>
 
         <button class="btn btn-primary" onclick="guardarCategoria()">Guardar Categoría</button>
       </div>
@@ -772,7 +815,7 @@ tr:hover td {
 
     <div>
       <div class="panel">
-        <div class="panel-title">Indicadores</div>
+        <div class="panel-title">Indicadores de Muestra</div>
         
         <div class="live-grid">
           <div class="live-box">
@@ -780,9 +823,20 @@ tr:hover td {
             <div class="live-val" id="live-c-total">0</div>
           </div>
           <div class="live-box">
-            <div class="live-label">FM %</div>
-            <div class="live-val" id="live-c-fm">0%</div>
+            <div class="live-label">Suma Categorías</div>
+            <div class="live-val" id="live-c-suma">0</div>
           </div>
+          <div class="live-box">
+            <div class="live-label">Diferencia</div>
+            <div class="live-val" id="live-c-diff">0</div>
+          </div>
+        </div>
+
+        <div id="validador-categoria" class="validador-live"></div>
+
+        <div style="margin-top: var(--space-lg); font-size: var(--font-size-xs); color: var(--color-text-muted);">
+          <div style="margin-bottom: var(--space-sm);">📊 <strong>Porcentajes:</strong></div>
+          <div id="c-percentages" style="line-height: 1.8;"></div>
         </div>
       </div>
     </div>
@@ -850,7 +904,7 @@ tr:hover td {
 // ════════════════════════════════════════════════════════════
 const CONFIG = {
   // Categorías estándar ESC
-  categorias: ['EXTRA', 'PRIMERA', 'SEGUNDA', 'TERCERA'],
+  categorias: ['EXP', 'DFCY', 'CAT1', 'COMERCIAL'],
   
   // Umbrales para estado de línea
   // Basado en análisis predictivo del historial
@@ -1168,29 +1222,98 @@ function guardarDefecto() {
 
 function catActualizarLive() {
   const total = parseInt(document.getElementById('c-total').value) || 0;
-  const fm = parseFloat(document.getElementById('c-fm').value) || 0;
+  const limpia = parseInt(document.getElementById('c-limpia').value) || 0;
+  const leve = parseInt(document.getElementById('c-leve').value) || 0;
+  const mejorado = parseInt(document.getElementById('c-mejorado').value) || 0;
+  const grave = parseInt(document.getElementById('c-grave').value) || 0;
 
+  const suma = limpia + leve + mejorado + grave;
+  const diferencia = total - suma;
+
+  // Actualizar indicadores
   document.getElementById('live-c-total').textContent = total;
-  document.getElementById('live-c-fm').textContent = fm.toFixed(1) + '%';
+  document.getElementById('live-c-suma').textContent = suma;
+  
+  // Color para diferencia
+  const diffEl = document.getElementById('live-c-diff');
+  diffEl.textContent = diferencia;
+  diffEl.className = 'live-val';
+  if (diferencia === 0 && total > 0) {
+    diffEl.classList.add('ok');
+  } else if (diferencia !== 0) {
+    diffEl.classList.add('danger');
+  }
+
+  // Calcular y mostrar porcentajes
+  let percentHtml = '';
+  if (total > 0) {
+    const pLimpia = (limpia / total * 100).toFixed(1);
+    const pLeve = (leve / total * 100).toFixed(1);
+    const pMejorado = (mejorado / total * 100).toFixed(1);
+    const pGrave = (grave / total * 100).toFixed(1);
+
+    percentHtml = `
+      EXP: ${pLimpia}%<br/>
+      DFCY: ${pLeve}%<br/>
+      CAT1: ${pMejorado}%<br/>
+      COMERCIAL: ${pGrave}%
+    `;
+  }
+  document.getElementById('c-percentages').innerHTML = percentHtml;
+
+  // Validación
+  const validadorEl = document.getElementById('validador-categoria');
+  if (total === 0) {
+    validadorEl.className = 'validador-live';
+  } else if (diferencia === 0) {
+    validadorEl.innerHTML = '✓ Suma correcta (Total = Categorías)';
+    validadorEl.className = 'validador-live show ok';
+  } else {
+    validadorEl.innerHTML = `⚠ Diferencia: ${diferencia} frutas (suma ≠ total)`;
+    validadorEl.className = 'validador-live show danger';
+  }
 }
 
 function guardarCategoria() {
   const total = parseInt(document.getElementById('c-total').value) || 0;
-  const fm = parseFloat(document.getElementById('c-fm').value) || 0;
+  const limpia = parseInt(document.getElementById('c-limpia').value) || 0;
+  const leve = parseInt(document.getElementById('c-leve').value) || 0;
+  const mejorado = parseInt(document.getElementById('c-mejorado').value) || 0;
+  const grave = parseInt(document.getElementById('c-grave').value) || 0;
 
+  const suma = limpia + leve + mejorado + grave;
+
+  // Validaciones
   if (total <= 0) {
     toast('❌ Total debe ser > 0');
     return;
   }
 
+  if (suma !== total) {
+    toast(`❌ La suma (${suma}) no coincide con Total (${total})`);
+    return;
+  }
+
+  if (document.getElementById('c-variedad').value === '') {
+    toast('❌ Selecciona una variedad');
+    return;
+  }
+
+  // Crear registro con desglose
   const categoria = {
     id: Date.now(),
     fecha: document.getElementById('c-fecha').value,
     variedad: document.getElementById('c-variedad').value,
-    cat: document.getElementById('c-categoria').value,
     total: total,
-    fm: fm,
-    hallazgos: []
+    limpia: limpia,
+    leve: leve,
+    mejorado: mejorado,
+    grave: grave,
+    // Calcular porcentajes
+    fm_limpia: (limpia / total * 100).toFixed(2),
+    fm_leve: (leve / total * 100).toFixed(2),
+    fm_mejorado: (mejorado / total * 100).toFixed(2),
+    fm_grave: (grave / total * 100).toFixed(2)
   };
 
   const categorias = load(K.cat);
@@ -1198,10 +1321,14 @@ function guardarCategoria() {
   
   renderHistorial();
 
+  document.getElementById('c-fecha').value = hoy();
   document.getElementById('c-variedad').value = '';
-  document.getElementById('c-categoria').value = '';
   document.getElementById('c-total').value = '';
-  document.getElementById('c-fm').value = '';
+  document.getElementById('c-limpia').value = '';
+  document.getElementById('c-leve').value = '';
+  document.getElementById('c-mejorado').value = '';
+  document.getElementById('c-grave').value = '';
+  document.getElementById('validador-categoria').className = 'validador-live';
   catActualizarLive();
 
   toast('✓ Categoría guardada');
@@ -1250,11 +1377,12 @@ function renderHistorial() {
         <td>${r.fecha}</td>
         <td><span class="badge badge-ok">Categoría</span></td>
         <td>${r.variedad}</td>
-        <td>${r.cat}</td>
-        <td>FM: ${r.fm}%</td>
-        <td style="text-align:center">${r.total}</td>
-        <td colspan="4" style="color:var(--color-text-muted);">—</td>
-        <td><button class="btn btn-danger btn-sm" onclick="eliminarRegistro('cat',${r.id})">✕</button></td>
+        <td>Total: ${r.total}</td>
+        <td>EXP: ${r.limpia} (${r.fm_limpia}%)</td>
+        <td>DFCY: ${r.leve} (${r.fm_leve}%)</td>
+        <td>CAT1: ${r.mejorado} (${r.fm_mejorado}%)</td>
+        <td>COMERCIAL: ${r.grave} (${r.fm_grave}%)</td>
+        <td colspan="3"><button class="btn btn-danger btn-sm" onclick="eliminarRegistro('cat',${r.id})">✕</button></td>
       </tr>
     `;
   });
@@ -1349,14 +1477,20 @@ class CSVExporter {
       return;
     }
 
-    const header = ['Fecha', 'Variedad', 'Categoria', 'Total', 'FM_pct'];
+    const header = ['Fecha', 'Variedad', 'Total', 'EXP_cant', 'EXP_%', 'DFCY_cant', 'DFCY_%', 'CAT1_cant', 'CAT1_%', 'COMERCIAL_cant', 'COMERCIAL_%'];
 
     const rows = data.map(r => [
       this.escaparCSV(r.fecha),
       this.escaparCSV(r.variedad),
-      this.escaparCSV(r.cat),
       r.total,
-      (r.fm ?? '—').toString().replace('.', ',')
+      r.limpia,
+      (r.fm_limpia ?? '—').toString().replace('.', ','),
+      r.leve,
+      (r.fm_leve ?? '—').toString().replace('.', ','),
+      r.mejorado,
+      (r.fm_mejorado ?? '—').toString().replace('.', ','),
+      r.grave,
+      (r.fm_grave ?? '—').toString().replace('.', ',')
     ]);
 
     this.descargarCSV(header, rows, 'cat');
@@ -1415,7 +1549,7 @@ function importarCSV(event) {
       }
 
       const header = lineas[0].split(',');
-      const tipo = header.includes('Hallazgos') ? 'cat' : 'def';
+      const tipo = header.includes('EXP_cant') ? 'cat' : 'def';
       const key = tipo === 'cat' ? K.cat : K.def;
       const existing = new Set(load(key).map(r => r.id));
 
@@ -1433,7 +1567,7 @@ function importarCSV(event) {
         let registro;
         if (tipo === 'cat') {
           const id = Date.now() + i;
-          const dupKey = String(cols[0] + cols[1] + cols[2]);
+          const dupKey = String(cols[0] + cols[1]);
           if (existing.has(dupKey)) {
             duplicados++;
             continue;
@@ -1442,10 +1576,15 @@ function importarCSV(event) {
             id,
             fecha: cols[0],
             variedad: cols[1],
-            cat: cols[2],
-            total: parseInt(cols[3]) || 0,
-            fm: parseFloat(cols[4]) || 0,
-            hallazgos: []
+            total: parseInt(cols[2]) || 0,
+            limpia: parseInt(cols[3]) || 0,
+            fm_limpia: parseFloat(cols[4]) || 0,
+            leve: parseInt(cols[5]) || 0,
+            fm_leve: parseFloat(cols[6]) || 0,
+            mejorado: parseInt(cols[7]) || 0,
+            fm_mejorado: parseFloat(cols[8]) || 0,
+            grave: parseInt(cols[9]) || 0,
+            fm_grave: parseFloat(cols[10]) || 0
           };
         } else {
           const id = Date.now() + i;
