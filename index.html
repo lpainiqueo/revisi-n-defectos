@@ -646,6 +646,127 @@ tr:hover td {
   border-bottom: var(--border-width) solid var(--color-border);
 }
 
+
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE MOBILE/TABLET
+   ════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .tab-panel {
+    padding: var(--space-md);
+  }
+
+  .panel {
+    padding: var(--space-md);
+  }
+
+  table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  body {
+    font-size: 12px;
+  }
+
+  header {
+    padding: 10px;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .tabs {
+    top: 58px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+
+  .tab-btn {
+    min-width: 120px;
+    flex: unset;
+    padding: 12px 10px;
+    font-size: 10px;
+  }
+
+  .two-col,
+  .row2,
+  .row3,
+  .live-grid,
+  .tol-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .hallazgo-row {
+    flex-wrap: wrap;
+  }
+
+  .hallazgo-input {
+    width: 100%;
+  }
+
+  .toast {
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+    width: auto;
+  }
+
+  .table-wrap {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+  }
+
+  input[type=number],
+  input[type=text],
+  input[type=date],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  :root {
+    --font-size-base: 12px;
+    --font-size-small: 10px;
+    --font-size-xs: 9px;
+    --font-size-lg: 18px;
+  }
+
+  header h1 {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .panel {
+    margin-bottom: 12px;
+  }
+
+  .rec-box {
+    align-items: flex-start;
+  }
+
+  .live-box {
+    padding: 8px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -656,10 +777,10 @@ tr:hover td {
 </header>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="cambiarTab('defecto')">Defectos</button>
-  <button class="tab-btn" onclick="cambiarTab('categoria')">Categorías</button>
-  <button class="tab-btn" onclick="cambiarTab('historial')">Historial</button>
-  <button class="tab-btn" onclick="cambiarTab('exportar')">Exportar</button>
+  <button class="tab-btn active" onclick="cambiarTab('defecto', this)">Defectos</button>
+  <button class="tab-btn" onclick="cambiarTab('categoria', this)">Categorías</button>
+  <button class="tab-btn" onclick="cambiarTab('historial', this)">Historial</button>
+  <button class="tab-btn" onclick="cambiarTab('exportar', this)">Exportar</button>
 </div>
 
 <!-- TAB: DEFECTOS -->
@@ -700,19 +821,19 @@ tr:hover td {
           <option value="Leaves">Leaves (Hojas)</option>
           <option value="Rotation">Rotation (ErrorDeRotacion)</option>
           <option value="InternalRot">InternalRot (PudricionInterna/Infiltracion)</option>
-          <option value="Scab">Scab (Escara/HeridasAbiertas)</option>
-          <option value="Cisarrot">Cisarrot (Pardeamiento)</option>
+          <option value="BrownRot">BrownRot (Pudrición/HeridasPodridas)</option>
+          <option value="ClearRot">ClearRot (Pardeamiento)</option>
           <option value="Crack">Crack (PartiduraPeduncular)</option>
           <option value="StemDefect">StemDefect (PartiduraPeduncular)</option>
           <option value="Decay">Decay (HeridasAbiertas/Peduncular)</option>
           <option value="ScaleScore">ScaleScore (Escama)</option>
           <option value="Pitting">Pitting (Picaduras)</option>
           <option value="BruiseArea">BruiseArea (Machucón)</option>
-          <option value="OiseScore">OiseScore (Machucón)</option>
+          <option value="OleoScore">OleoScore (Machucón)</option>
           <option value="Sunburn">Sunburn (GolpeDeSol/QuemaduraDeSol)</option>
           <option value="StemendRusset">StemendRusset (RussetPeduncular)</option>
           <option value="RussetArea">RussetArea (RussetareaDelFruto)</option>
-          <option value="Misshapen">Misshapen (Russet)</option>
+          <option value="DatkScars">DatkScars (Granizo)</option>
           <option value="LightScars">LightScars (Russet)</option>
           <option value="Defects">Defects (DefectoGeneral/Superficial)</option>
         </select>
@@ -788,6 +909,15 @@ tr:hover td {
           <option value="Honey">Honey</option>
           <option value="MAIA1">MAIA1</option>
           <option value="otras">otras</option>
+        </select>
+        
+        <label>Categoría Objetivo (categoría que debería tener)</label>
+        <select id="c-categoria-objetivo">
+          <option value="">-- Seleccionar --</option>
+          <option value="EXP">EXP (FrutaSinDefectos)</option>
+          <option value="DFCY">DFCY (FrutaConDefectosLeves)</option>
+          <option value="CAT1">CAT1 (FrutaConDefectosModeredos)</option>
+          <option value="COMERCIAL">COMERCIAL (FrutaNoExportable)</option>
         </select>
         
         <label>Total (frutas revisadas en muestra)</label>
@@ -933,12 +1063,23 @@ const K = {
 // STORAGE SIMPLE
 // ════════════════════════════════════════════════════════════
 function load(key) {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = localStorage.getItem(key);
+    const parsed = data ? JSON.parse(data) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.error('Error leyendo localStorage:', err);
+    return [];
+  }
 }
 
 function save(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (err) {
+    console.error('Error guardando localStorage:', err);
+    alert('No fue posible guardar los datos localmente.');
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1029,6 +1170,17 @@ function cambiarTab(tabName) {
   
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
+}
+
+
+function sanitizeHTML(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1299,11 +1451,17 @@ function guardarCategoria() {
     return;
   }
 
+  if (document.getElementById('c-categoria-objetivo').value === '') {
+    toast('❌ Selecciona la categoría objetivo');
+    return;
+  }
+
   // Crear registro con desglose
   const categoria = {
     id: Date.now(),
     fecha: document.getElementById('c-fecha').value,
     variedad: document.getElementById('c-variedad').value,
+    categoriaObjetivo: document.getElementById('c-categoria-objetivo').value,
     total: total,
     limpia: limpia,
     leve: leve,
@@ -1323,6 +1481,7 @@ function guardarCategoria() {
 
   document.getElementById('c-fecha').value = hoy();
   document.getElementById('c-variedad').value = '';
+  document.getElementById('c-categoria-objetivo').value = '';
   document.getElementById('c-total').value = '';
   document.getElementById('c-limpia').value = '';
   document.getElementById('c-leve').value = '';
@@ -1352,15 +1511,15 @@ function renderHistorial() {
 
   defectos.forEach(r => {
     const scoreCol = `<span style="color:${r.score > CONFIG.estadoLinea.critica ? 'var(--color-danger)' : r.score > CONFIG.estadoLinea.inestable ? 'var(--color-warn)' : 'var(--color-ok)'};font-weight:bold;">${r.score.toFixed(2)}</span>`;
-    const recBadge = `<span class="badge badge-${r.score > CONFIG.estadoLinea.critica ? 'danger' : r.score > CONFIG.estadoLinea.inestable ? 'warn' : 'ok'}">${r.rec}</span>`;
+    const recBadge = `<span class="badge badge-${r.score > CONFIG.estadoLinea.critica ? 'danger' : r.score > CONFIG.estadoLinea.inestable ? 'warn' : 'ok'}">${sanitizeHTML(r.rec)}</span>`;
 
     html += `
       <tr>
-        <td>${r.fecha}</td>
+        <td>${sanitizeHTML(r.fecha)}</td>
         <td><span class="badge badge-warn">Defecto</span></td>
-        <td>${r.variedad}</td>
-        <td>${r.cat}</td>
-        <td>${r.defecto}</td>
+        <td>${sanitizeHTML(r.variedad)}</td>
+        <td>${sanitizeHTML(r.cat)}</td>
+        <td>${sanitizeHTML(r.defecto)}</td>
         <td style="text-align:center">${r.total}</td>
         <td>${r.fnRaw}</td>
         <td>${r.fpRaw}</td>
@@ -1374,10 +1533,10 @@ function renderHistorial() {
   categorias.forEach(r => {
     html += `
       <tr>
-        <td>${r.fecha}</td>
+        <td>${sanitizeHTML(r.fecha)}</td>
         <td><span class="badge badge-ok">Categoría</span></td>
-        <td>${r.variedad}</td>
-        <td>Total: ${r.total}</td>
+        <td>${sanitizeHTML(r.variedad)}</td>
+        <td><strong>${sanitizeHTML(r.categoriaObjetivo || '—')}</strong></td>
         <td>EXP: ${r.limpia} (${r.fm_limpia}%)</td>
         <td>DFCY: ${r.leve} (${r.fm_leve}%)</td>
         <td>CAT1: ${r.mejorado} (${r.fm_mejorado}%)</td>
@@ -1477,11 +1636,12 @@ class CSVExporter {
       return;
     }
 
-    const header = ['Fecha', 'Variedad', 'Total', 'EXP_cant', 'EXP_%', 'DFCY_cant', 'DFCY_%', 'CAT1_cant', 'CAT1_%', 'COMERCIAL_cant', 'COMERCIAL_%'];
+    const header = ['Fecha', 'Variedad', 'CategoriaObjetivo', 'Total', 'EXP_cant', 'EXP_%', 'DFCY_cant', 'DFCY_%', 'CAT1_cant', 'CAT1_%', 'COMERCIAL_cant', 'COMERCIAL_%'];
 
     const rows = data.map(r => [
       this.escaparCSV(r.fecha),
       this.escaparCSV(r.variedad),
+      this.escaparCSV(r.categoriaObjetivo || '—'),
       r.total,
       r.limpia,
       (r.fm_limpia ?? '—').toString().replace('.', ','),
@@ -1536,6 +1696,12 @@ function importarCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Archivo demasiado grande. Máximo permitido: 5MB.');
+    event.target.value = '';
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = e => {
     try {
@@ -1576,15 +1742,16 @@ function importarCSV(event) {
             id,
             fecha: cols[0],
             variedad: cols[1],
-            total: parseInt(cols[2]) || 0,
-            limpia: parseInt(cols[3]) || 0,
-            fm_limpia: parseFloat(cols[4]) || 0,
-            leve: parseInt(cols[5]) || 0,
-            fm_leve: parseFloat(cols[6]) || 0,
-            mejorado: parseInt(cols[7]) || 0,
-            fm_mejorado: parseFloat(cols[8]) || 0,
-            grave: parseInt(cols[9]) || 0,
-            fm_grave: parseFloat(cols[10]) || 0
+            categoriaObjetivo: cols[2],
+            total: parseInt(cols[3]) || 0,
+            limpia: parseInt(cols[4]) || 0,
+            fm_limpia: parseFloat(cols[5]) || 0,
+            leve: parseInt(cols[6]) || 0,
+            fm_leve: parseFloat(cols[7]) || 0,
+            mejorado: parseInt(cols[8]) || 0,
+            fm_mejorado: parseFloat(cols[9]) || 0,
+            grave: parseInt(cols[10]) || 0,
+            fm_grave: parseFloat(cols[11]) || 0
           };
         } else {
           const id = Date.now() + i;
